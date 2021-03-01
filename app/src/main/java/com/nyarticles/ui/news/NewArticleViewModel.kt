@@ -1,0 +1,79 @@
+package com.nyarticles.ui.news
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.data.enums.SectionEnum
+import com.data.local.models.State
+import com.data.remote.models.NewsArticle
+import com.data.repository.NewsArticleRepository
+import com.nyarticles.BuildConfig
+import com.nyarticles.utils.ErrorResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class NewArticleViewModel @Inject constructor(val newsArticleRepository: NewsArticleRepository) :
+    ViewModel() {
+
+
+    var errorResponse: MutableLiveData<ErrorResponse>? = null
+
+    private val _newsUiLiveData = MutableLiveData<State<String>>()
+
+    val newsUiLiveData: LiveData<State<String>>
+        get() = _newsUiLiveData
+
+
+    private val _newsLiveData = MutableLiveData<List<NewsArticle>>()
+
+    val newsLiveData: LiveData<List<NewsArticle>>
+        get() = _newsLiveData
+
+    fun setErrorResponse(errorResponse: ErrorResponse?) {
+        this.errorResponse?.value = errorResponse
+    }
+
+
+    fun getResourceString(resourceId: Int): String {
+        return newsArticleRepository.dataManager.getResourceManager().getString(resourceId)
+    }
+
+    fun getMostViewedNYTimePopularArticle(newsArticlePeriod: Int = 7) {
+
+        viewModelScope.launch(Dispatchers.Default) {
+            _newsUiLiveData.postValue(State.loading())
+            try {
+                val result = newsArticleRepository.getMostViewedNYTimePopularArticle(
+                    newsArticlePeriod,
+                    SectionEnum.ALL_SECTION.type,
+                    BuildConfig.API_KEY,
+                )
+
+                when (result) {
+                    is State.Success -> {
+                        if ("OK" == result.wrapperData.status) {
+                            _newsLiveData.postValue(result.wrapperData.results)
+                            _newsUiLiveData.postValue(State.success(""))
+                        } else {
+                            //_newsUiLiveData.postValue(State.error<String>(result.wrapperData.numResults))
+                        }
+                    }
+                    is State.Error -> {
+                        _newsUiLiveData.postValue(State.error<String>(result.serverError))
+                    }
+                }
+
+            } catch (e: Exception) {
+                _newsUiLiveData.postValue(State.error<String>(e.message.toString()))
+            }
+        }
+    }
+
+    fun isLoading(): Boolean {
+        return false
+    }
+}
