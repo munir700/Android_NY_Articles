@@ -2,7 +2,6 @@ package com.data.remote
 
 import com.data.local.models.ResponsePacket
 import com.data.remote.models.NewsArticle
-import com.data.remote.models.Results
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

@@ -51,20 +51,19 @@ class ApiServiceTest {
     }
 
     @Test
-    fun test_getImages() = runBlocking {
+    fun test_getNewsArticle() = runBlocking {
         enqueueResponse("news_article.json")
         val newArticles = apiService.getMostViewedNYTimePopularArticle(
             section = SectionEnum.ALL_SECTION.type,
             period = 7,
             apiKey = "q71nyctb41ZYdqpkeE3QaUX6XoXNbzqu",
-
-            ).body()
+        ).body()
 
         assertThat(newArticles, notNullValue())
-        assertThat(newArticles?.results?.get(0)?.id, `is`("enriquelopezgarre"))
-        assertThat(newArticles?.results?.get(0)?.id, `is`("enriquelopezgarre"))
-        assertThat(newArticles?.results?.get(0)?.id, `is`("enriquelopezgarre"))
-        assertThat(newArticles?.results?.get(0)?.id, `is`("enriquelopezgarre"))
+        assertThat(newArticles?.results?.get(0)?.id, `is`(100000007615891))
+        assertThat(newArticles?.results?.get(0)?.assetId, `is`(100000007615891))
+        assertThat(newArticles?.results?.get(0)?.section, `is`("U.S."))
+        assertThat(newArticles?.results?.get(0)?.type, `is`("Article"))
 
     }
 
