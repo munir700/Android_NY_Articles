@@ -16,5 +16,6 @@
     <string name="STR_YES">Yes</string>
 
     <string name="STR_NEWS_DETAILS_TRANSITION">NEWS_DETAILS_TRANSITION</string>
+
     <string name="NEW_ARTICLE_FRAGMENT">NEWS_DETAILS_TRANSITION</string>
 </resources>
