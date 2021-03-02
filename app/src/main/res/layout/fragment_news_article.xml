@@ -16,7 +16,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey_light">
+        android:background="@color/grey_light"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/input_layout"
@@ -30,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/_25sdp"
                 android:gravity="center"
-                android:hint="Enter period for recent news article"
+                android:hint="@string/enter_period_for_recent_news_article"
                 android:inputType="number"
                 android:padding="@dimen/_12sdp"
                 android:textColor="@color/black"
@@ -38,12 +40,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <View
+                android:id="@+id/line_separator_v"
+                android:layout_width="match_parent"
+                android:background="@color/border_color_2"
+                android:layout_height="1dp"
+                app:layout_constraintTop_toBottomOf="@+id/period_et" />
+
             <Button
                 android:id="@+id/button"
                 style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Submit"
+                android:text="@string/submit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/period_et"
                 app:layout_constraintTop_toTopOf="parent" />

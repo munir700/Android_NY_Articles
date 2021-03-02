@@ -12,6 +12,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.nyarticles.R
+import com.nyarticles.utils.dialog.ActionDialog
 
 abstract class BaseFragment<VM : ViewModel, VB : ViewDataBinding>(@LayoutRes private val layoutResId: Int) :
     Fragment() {
@@ -74,5 +75,12 @@ abstract class BaseFragment<VM : ViewModel, VB : ViewDataBinding>(@LayoutRes pri
         if (progressBar?.isShown == false) {
             progressBar?.visibility = View.VISIBLE
         }
+    }
+
+    /**
+     * on Server Request Failed.
+     */
+    open fun onApiRequestFailed(message: String?) {
+        ActionDialog(requireContext(), message, null, true).show()
     }
 }

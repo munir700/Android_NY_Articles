@@ -1,5 +1,6 @@
 package com.nyarticles.ui.news
 
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,8 +10,11 @@ import com.data.remote.models.NewsArticle
 import com.nyarticles.BR
 import com.nyarticles.R
 import com.nyarticles.databinding.FragmentNewsArticleBinding
+import com.data.enums.ApiEventsEnum
+import com.nyarticles.enums.ErrorResponseEnum
 import com.nyarticles.ui.base.BaseFragment
 import com.nyarticles.ui.news.adapter.ListingAdapter
+import com.nyarticles.utils.ErrorResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,7 +31,7 @@ class NewArticleFragment :
     override val viewModel: NewArticleViewModel by viewModels()
 
     override fun getBindingVariable(): Int {
-        return BR.newsArticle
+        return BR.vm
     }
 
     override fun onInitDataBinding() {
@@ -51,10 +55,12 @@ class NewArticleFragment :
             newsArticleListAdapter.submitList(copy)
         })
 
-        bindings.searchAgainBtn.setOnClickListener {
+        bindings.searchAgainBtn.setOnClickListener { view ->
             val newPeriod = bindings.periodEt.text?.trim().toString()
-            newPeriod.takeIf { it.isNotEmpty() }.let {
-                viewModel.getMostViewedNYTimePopularArticle(newPeriod.toInt());
+            if (newPeriod.isNotEmpty()) {
+                viewModel.getMostViewedNYTimePopularArticle(newPeriod.toInt())
+            } else {
+                viewModel.getMostViewedNYTimePopularArticle()
             }
         }
 
@@ -65,8 +71,8 @@ class NewArticleFragment :
 
         bindings.button.setOnClickListener {
             val newPeriod = bindings.periodEt.text?.trim().toString()
-            newPeriod.takeIf { it.isNotEmpty() }.let {
-                viewModel.getMostViewedNYTimePopularArticle(newPeriod.toInt());
+            if (newPeriod.isNotEmpty()) {
+                viewModel.getMostViewedNYTimePopularArticle(newPeriod.toInt())
             }
         }
     }
@@ -77,9 +83,42 @@ class NewArticleFragment :
             when (it) {
                 is State.Success -> {
                     hideProgress()
+                    bindings.pullToRefresh.visibility = View.VISIBLE
+                    bindings.constraintError.visibility = View.GONE
                 }
                 is State.Error -> {
                     hideProgress()
+                    when (viewModel.newsArticleRepository.apiEventsEnum.eventType) {
+                        ApiEventsEnum.ON_NO_DATA_RECEIVED.eventType -> {
+                            if (it.serverError.isNotEmpty()) {
+                                onApiRequestFailed(it.serverError)
+                            }
+
+                            bindings.pullToRefresh.visibility = View.GONE
+                            bindings.constraintError.visibility = View.VISIBLE
+                            newsArticleListAdapter.submitList(listOf())
+                            viewModel.setErrorResponse(
+                                ErrorResponse.Builder(ErrorResponseEnum.NO_DATA_RECEIVED).build()
+                            )
+                        }
+
+                        ApiEventsEnum.NO_INTERNET_CONNECTION.eventType -> {
+                            bindings.pullToRefresh.visibility = View.GONE
+                            bindings.constraintError.visibility = View.VISIBLE
+                            viewModel.setErrorResponse(
+                                ErrorResponse.Builder(ErrorResponseEnum.NO_INTERNET_CONNECTION)
+                                    .build()
+                            )
+                        }
+
+                        ApiEventsEnum.ON_API_REQUEST_FAILURE.eventType -> {
+                            bindings.constraintError.visibility = View.VISIBLE
+                            viewModel.setErrorResponse(
+                                ErrorResponse.Builder(ErrorResponseEnum.API_REQUEST_FAILURE).build()
+                            )
+                        }
+                    }
+
                 }
                 is State.Loading -> {
                     showProgress()

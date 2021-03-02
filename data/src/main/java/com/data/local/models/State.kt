@@ -6,7 +6,7 @@ package com.data.local.models
  */
 sealed class State<out T> {
 
-    class Loading<T> : State<T>()
+    class Loading<T>() : State<T>()
 
     data class Success<T>(val wrapperData: T) : State<T>()
 
@@ -29,7 +29,7 @@ sealed class State<out T> {
          * Returns [State.Error] instance.
          * @param message Description of failure.
          */
-        fun <T> error(serverError: String) =
+        fun <T> error( serverError: String) =
             Error(serverError)
     }
 }

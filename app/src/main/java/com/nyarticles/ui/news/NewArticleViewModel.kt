@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.data.enums.ApiEventsEnum
 import com.data.enums.SectionEnum
 import com.data.local.models.State
 import com.data.remote.models.NewsArticle
@@ -19,8 +20,7 @@ import javax.inject.Inject
 class NewArticleViewModel @Inject constructor(val newsArticleRepository: NewsArticleRepository) :
     ViewModel() {
 
-
-    var errorResponse: MutableLiveData<ErrorResponse>? = null
+    var errorResponse: MutableLiveData<ErrorResponse> = MutableLiveData()
 
     private val _newsUiLiveData = MutableLiveData<State<String>>()
 
@@ -33,13 +33,17 @@ class NewArticleViewModel @Inject constructor(val newsArticleRepository: NewsArt
     val newsLiveData: LiveData<List<NewsArticle>>
         get() = _newsLiveData
 
-    fun setErrorResponse(errorResponse: ErrorResponse?) {
-        this.errorResponse?.value = errorResponse
+    fun setErrorResponse(errorResponse: ErrorResponse) {
+        this.errorResponse.value = errorResponse
     }
 
 
     fun getResourceString(resourceId: Int): String {
-        return newsArticleRepository.dataManager.getResourceManager().getString(resourceId)
+        return try {
+            newsArticleRepository.dataManager.getResourceManager().getString(resourceId)
+        } catch (e: Exception) {
+             ""
+        }
     }
 
     fun getMostViewedNYTimePopularArticle(newsArticlePeriod: Int = 7) {
@@ -55,17 +59,20 @@ class NewArticleViewModel @Inject constructor(val newsArticleRepository: NewsArt
 
                 when (result) {
                     is State.Success -> {
+                        newsArticleRepository.apiEventsEnum = ApiEventsEnum.ON_DATA_RECEIVED
                         if ("OK" == result.wrapperData.status) {
                             _newsLiveData.postValue(result.wrapperData.results)
                             _newsUiLiveData.postValue(State.success(""))
                         } else {
-                            //_newsUiLiveData.postValue(State.error<String>(result.wrapperData.numResults))
+                            newsArticleRepository.apiEventsEnum = ApiEventsEnum.ON_NO_DATA_RECEIVED
+                            _newsUiLiveData.postValue(State.error<String>("result.wrapperData.results"))
                         }
                     }
                     is State.Error -> {
                         _newsUiLiveData.postValue(State.error<String>(result.serverError))
                     }
                 }
+
 
             } catch (e: Exception) {
                 _newsUiLiveData.postValue(State.error<String>(e.message.toString()))

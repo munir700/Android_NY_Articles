@@ -18,4 +18,6 @@
     <string name="STR_NEWS_DETAILS_TRANSITION">NEWS_DETAILS_TRANSITION</string>
 
     <string name="NEW_ARTICLE_FRAGMENT">NEWS_DETAILS_TRANSITION</string>
+    <string name="enter_period_for_recent_news_article">Enter period for recent news article</string>
+    <string name="submit">Submit</string>
 </resources>

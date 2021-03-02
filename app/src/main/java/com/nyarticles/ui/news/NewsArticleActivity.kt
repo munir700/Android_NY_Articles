@@ -4,14 +4,12 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.setupActionBarWithNavController
 
 import com.nyarticles.BR
 import com.nyarticles.R
 import com.nyarticles.databinding.ActivityNewsArticleBinding
 import com.nyarticles.ui.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_news_article.*
 
 @AndroidEntryPoint
 class NewsArticleActivity :
@@ -28,8 +26,6 @@ class NewsArticleActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         navController = findNavController(R.id.nav_host_fragment)
-        //setSupportActionBar(toolbar)
-        setupActionBarWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {

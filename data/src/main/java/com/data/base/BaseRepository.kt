@@ -2,12 +2,14 @@ package com.data.base
 
 import com.core.utils.NetworkUtils
 import com.data.R
+import com.data.enums.ApiEventsEnum
 import com.data.local.models.State
 import com.data.manager.DataManager
 import retrofit2.Response
 
 open class BaseRepository(open val dataManager: DataManager) {
 
+    var apiEventsEnum = ApiEventsEnum.ON_API_CALL_START
 
     protected open fun isNetworkNotAvailable(): Boolean {
         var isConnected = true
@@ -21,6 +23,7 @@ open class BaseRepository(open val dataManager: DataManager) {
         call: suspend () -> Response<T>,
     ): State<T> {
         if (isNetworkNotAvailable()) {
+            apiEventsEnum = ApiEventsEnum.NO_INTERNET_CONNECTION
             return State.Error(
                 dataManager.getResourceManager().getString(
                     R.string.internet_error
@@ -40,6 +43,7 @@ open class BaseRepository(open val dataManager: DataManager) {
         return if (response.isSuccessful)
             State.Success(response.body()!!)
         else {
+            apiEventsEnum = ApiEventsEnum.ON_API_REQUEST_FAILURE
             State.Error(
                 response.message()
             )
