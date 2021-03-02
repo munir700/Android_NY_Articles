@@ -54,7 +54,7 @@ class NewArticleViewModel @Inject constructor(val newsArticleRepository: NewsArt
                 val result = newsArticleRepository.getMostViewedNYTimePopularArticle(
                     newsArticlePeriod,
                     SectionEnum.ALL_SECTION.type,
-                    BuildConfig.API_KEY,
+                    BuildConfig.API_KEY
                 )
 
                 when (result) {
