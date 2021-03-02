@@ -22,5 +22,4 @@ class NewsArticleRepository @Inject constructor(override val dataManager: DataMa
                 .getMostViewedNYTimePopularArticle(section, newsArticlePeriod, apiKey)
         }
     }
-
 }
